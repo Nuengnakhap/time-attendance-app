@@ -60,16 +60,17 @@ export default function CheckInFromScreen({
       setPermission(permission);
       setIsOpen(true);
 
-      const { data } = await axios.get(
-        "https://maps.googleapis.com/maps/api/geocode/json",
-        {
+      axios
+        .get("https://maps.googleapis.com/maps/api/geocode/json", {
           params: {
             latlng: latitude + "," + longitude,
             key: Constants.expoConfig?.extra?.mapsApiKey,
           },
-        }
-      );
-      setPlaceName(data.results[0]?.formatted_address ?? "");
+        })
+        .then(({ data }) => {
+          setPlaceName(data.results[0]?.formatted_address ?? "");
+        })
+        .catch(() => {});
     };
 
     init();

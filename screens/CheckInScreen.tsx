@@ -137,7 +137,11 @@ export default function CheckInScreen({
           </MapView>
           <View style={styles.button}>
             <Button
-              text="Check-In"
+              text={
+                !loading && !canCheckInToday
+                  ? "You have already checked in today."
+                  : "Check-In"
+              }
               disabled={!canCheckIn || !canCheckInToday}
               loading={loading}
               onPress={() => navigation.navigate("CheckInFrom", location)}
