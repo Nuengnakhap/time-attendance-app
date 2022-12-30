@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "642856516925",
+    "project_id": "time-attendance-onez",
+    "storage_bucket": "time-attendance-onez.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642856516925:android:f1fa5ed89cb876b615d954",
+        "android_client_info": {
+          "package_name": "com.onez.time_attendance"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "642856516925-nlvjrnmcqkh4qhpfqo2p84jh9er51reb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_5WThhCnvrjQgvu8BoD_zfJXgf8FEziM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "642856516925-nlvjrnmcqkh4qhpfqo2p84jh9er51reb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "642856516925-6rvfhnh3i0ee4hnudcvt931286b6phnq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.onez.time-attendance"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

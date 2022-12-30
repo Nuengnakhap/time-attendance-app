@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "time-attendance-app",
+    "name": "Time Attendance",
     "slug": "time-attendance-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,22 +13,30 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/e3cb49a6-14c2-45ed-88eb-9cc6db2d7a0b"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.onez.time-attendance",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+      "package": "com.onez.time_attendance",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": ["sentry-expo"],
+    "extra": {
+      "eas": {
+        "projectId": "e3cb49a6-14c2-45ed-88eb-9cc6db2d7a0b"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }
