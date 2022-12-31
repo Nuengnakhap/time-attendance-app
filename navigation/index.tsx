@@ -25,6 +25,7 @@ import {
   RootTabScreenProps,
 } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
+import CameraScreen from "@screens/CameraScreen";
 
 export default function Navigation({}: { colorScheme: ColorSchemeName }) {
   return (
@@ -56,6 +57,11 @@ function RootNavigator() {
       <Stack.Screen
         name="CheckInSuccess"
         component={CheckInSuccessScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Camera"
+        component={CameraScreen}
         options={{ headerShown: false }}
       />
       <Stack.Group screenOptions={{ presentation: "modal" }}>

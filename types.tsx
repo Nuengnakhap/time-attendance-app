@@ -9,6 +9,7 @@ import {
   NavigatorScreenParams,
 } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { CameraCapturedPicture, CameraType } from "expo-camera";
 
 declare global {
   namespace ReactNavigation {
@@ -27,6 +28,10 @@ export type RootStackParamList = {
     latitude: number;
     longitude: number;
     placeName: string;
+  };
+  Camera: {
+    type: CameraType;
+    onSave: (value: CameraCapturedPicture) => void;
   };
 };
 

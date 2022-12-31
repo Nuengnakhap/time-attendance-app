@@ -1,18 +1,13 @@
 import Button from "@components/Button";
-import CameraShot from "@components/CameraShot";
 import { MonoText } from "@components/StyledText";
 import firebase from "@configs/firebase";
 import { FontAwesome } from "@expo/vector-icons";
 import useDeviceId from "@hooks/useDevice";
+import useLocation from "@hooks/useLocation";
 import axios from "axios";
 import dayjs from "dayjs";
-import {
-  Camera,
-  CameraCapturedPicture,
-  CameraType,
-  PermissionResponse,
-} from "expo-camera";
-import * as Linking from "expo-linking";
+import { CameraCapturedPicture, CameraType } from "expo-camera";
+import Constants from "expo-constants";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 import React, { useEffect, useRef, useState } from "react";
@@ -26,8 +21,6 @@ import {
 } from "react-native";
 import tinycolor from "tinycolor2";
 import { RootStackScreenProps } from "types";
-import Constants from "expo-constants";
-import useLocation from "@hooks/useLocation";
 
 type From = {
   selfie: string;
@@ -47,65 +40,42 @@ export default function CheckInFromScreen({
   const date = useRef<Date>();
 
   const [from, setFrom] = useState<From>({ selfie: "", place: "" });
-  const [step, setStep] = useState(0);
-  const [guiding, setGuiding] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
-  const [permission, setPermission] = useState<PermissionResponse | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [placeName, setPlaceName] = useState("");
 
   useEffect(() => {
-    const init = async () => {
-      const permission = await Camera.requestCameraPermissionsAsync();
-      setPermission(permission);
-      setIsOpen(true);
-
-      axios
-        .get("https://maps.googleapis.com/maps/api/geocode/json", {
-          params: {
-            latlng: latitude + "," + longitude,
-            key: Constants.expoConfig?.extra?.mapsApiKey,
-          },
-        })
-        .then(({ data }) => {
-          setPlaceName(data.results[0]?.formatted_address ?? "");
-        })
-        .catch(() => {});
-    };
-
-    init();
+    axios
+      .get("https://maps.googleapis.com/maps/api/geocode/json", {
+        params: {
+          latlng: latitude + "," + longitude,
+          key: Constants.expoConfig?.extra?.mapsApiKey,
+        },
+      })
+      .then(({ data }) => {
+        setPlaceName(data.results[0]?.formatted_address ?? "");
+      })
+      .catch(() => {});
   }, []);
-
-  const openSetting = () => {
-    Linking.openSettings();
-  };
 
   const setFormData = (key: keyof From) => (value: From[keyof From]) => {
     setFrom({ ...from, [key]: value });
   };
 
-  const onCloseCamera = () => {
-    setIsOpen(false);
-    setGuiding(false);
-  };
-
-  const onSavePicture = (value: CameraCapturedPicture) => {
-    setIsOpen(false);
+  const onSavePicture = (step: number) => (value: CameraCapturedPicture) => {
     setFormData(steps[step])(value.uri);
-    if (step == 0 && guiding) {
-      setStep(1);
-      setIsOpen(true);
-      setGuiding(false);
-    }
   };
 
   const onEditPicture = (key: keyof From) => {
     if (key == "selfie") {
-      setStep(0);
-      setIsOpen(true);
+      navigation.navigate("Camera", {
+        type: CameraType.front,
+        onSave: onSavePicture(0),
+      });
     } else if (key == "place") {
-      setStep(1);
-      setIsOpen(true);
+      navigation.navigate("Camera", {
+        type: CameraType.back,
+        onSave: onSavePicture(1),
+      });
     }
   };
 
@@ -186,70 +156,34 @@ export default function CheckInFromScreen({
     }
   };
 
-  if (!permission) {
-    // Camera permissions are still loading
-    return <View />;
-  }
-
-  if (!permission.granted) {
-    // Camera permissions are not granted yet
-    return (
-      <View style={[styles.screen, { paddingHorizontal: 24 }]}>
-        <MonoText style={{ textAlign: "center", marginBottom: 10 }}>
-          {
-            "Permission to access camera was denied!\nPlease open setting for allow access camera."
-          }
-        </MonoText>
-        <Button onPress={openSetting} text="Open Setting" />
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.screen}>
-      {isOpen ? (
-        <CameraShot
-          key={step}
-          type={step == 0 ? CameraType.front : CameraType.back}
-          onClose={onCloseCamera}
-          onSave={onSavePicture}
-        />
-      ) : (
-        <View style={{ flex: 1 }}>
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <MonoText bold style={styles.titleText}>
-              Current Time
-            </MonoText>
-            <TimeInterval onInterval={(e) => (date.current = e)} />
-            <MonoText bold style={styles.titleText}>
-              Place
-            </MonoText>
-            <View style={styles.textBox}>
-              <MonoText>{placeName}</MonoText>
-            </View>
-            <MonoText bold style={styles.titleText}>
-              Selfie Image
-            </MonoText>
-            <ImageEdit
-              uri={from.selfie}
-              onPress={() => onEditPicture("selfie")}
-            />
-            <MonoText bold style={styles.titleText}>
-              Surround Image
-            </MonoText>
-            <ImageEdit
-              uri={from.place}
-              onPress={() => onEditPicture("place")}
-            />
-          </ScrollView>
-          <Button
-            text="Submit"
-            onPress={onSubmit}
-            loading={submitting}
-            disabled={!from.selfie || !from.place}
-          />
+    <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.screen}>
+        <MonoText bold style={styles.titleText}>
+          Current Time
+        </MonoText>
+        <TimeInterval onInterval={(e) => (date.current = e)} />
+        <MonoText bold style={styles.titleText}>
+          Place
+        </MonoText>
+        <View style={styles.textBox}>
+          <MonoText>{placeName}</MonoText>
         </View>
-      )}
+        <MonoText bold style={styles.titleText}>
+          Selfie Image
+        </MonoText>
+        <ImageEdit uri={from.selfie} onPress={() => onEditPicture("selfie")} />
+        <MonoText bold style={styles.titleText}>
+          Surround Image
+        </MonoText>
+        <ImageEdit uri={from.place} onPress={() => onEditPicture("place")} />
+      </ScrollView>
+      <Button
+        text="Submit"
+        onPress={onSubmit}
+        loading={submitting}
+        disabled={!from.selfie || !from.place}
+      />
     </View>
   );
 }
@@ -293,7 +227,7 @@ function TimeInterval({ onInterval }: { onInterval?: (date: Date) => void }) {
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: "white",
     paddingHorizontal: 24,
     paddingVertical: 16,
